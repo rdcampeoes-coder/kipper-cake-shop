@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f7f4ef">
+  <title>Kipper Cake Shop</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div id="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="brand-mark">K</div><div><strong>KIPPER</strong><span>CAKE SHOP</span></div></div>
+    <nav>
+      <button class="nav-btn active" data-view="dashboard">⌂ <span>Início</span></button>
+      <button class="nav-btn" data-view="orders">◫ <span>Encomendas</span></button>
+      <button class="nav-btn" data-view="clients">♡ <span>Clientes</span></button>
+      <button class="nav-btn" data-view="products">▦ <span>Produtos</span></button>
+      <button class="nav-btn" data-view="stock">◧ <span>Stock</span></button>
+      <button class="nav-btn" data-view="finance">€ <span>Finanças</span></button>
+      <button class="nav-btn" data-view="more">⋯ <span>Mais</span></button>
+    </nav>
+  </aside>
+  <main class="main">
+    <header class="topbar"><div><h1 id="pageTitle">Início</h1><p id="pageSubtitle">Visão geral do negócio</p></div><div class="top-actions"><span id="dbStatus" class="badge demo">A carregar…</span><button id="quickOrder" class="primary">+ Nova encomenda</button></div></header>
+    <section id="view"><div class="card">A carregar…</div></section>
+  </main>
+</div>
+<div id="modal" class="modal hidden"><div class="modal-card"><button class="modal-close" data-close>×</button><div id="modalBody"></div></div></div>
+<div id="toast" class="toast hidden"></div>
+<script src="/state.js"></script>
+<script src="/views.js"></script>
+<script src="/forms.js"></script>
+<script src="/orders-ui.js"></script>
+</body>
+</html>
