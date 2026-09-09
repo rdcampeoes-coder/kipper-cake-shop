@@ -16,9 +16,10 @@ async function api(url,opts={}){
   return r.json();
 }
 async function reload(){
-  data=await api('/api/bootstrap');
+  const loaded=await api('/api/bootstrap');
   const h=await api('/api/health');
-  $('#dbStatus').textContent=h.database?'Base de dados ligada':'Modo protótipo';
+  data=(!h.database && !(loaded.products||[]).length && window.KIPPER_DEMO)?structuredClone(window.KIPPER_DEMO):loaded;
+  $('#dbStatus').textContent=h.database?'Base de dados ligada':'Modo protótipo · dados de demonstração';
   $('#dbStatus').className='badge '+(h.database?'':'demo');
   render();
 }
