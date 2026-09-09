@@ -1,0 +1,73 @@
+/* Kipper branding and mobile top navigation overrides */
+.brand{justify-content:center}
+.brand-logo{display:block;width:100%;max-width:176px;height:auto;object-fit:contain}
+
+@media(max-width:1050px) and (min-width:721px){
+  .brand{padding-left:0;padding-right:0}
+  .brand-logo{max-width:54px}
+}
+
+@media(max-width:720px){
+  #app{display:block}
+  .sidebar{
+    position:fixed;
+    top:0;
+    bottom:auto;
+    left:0;
+    right:0;
+    width:100%;
+    height:auto;
+    z-index:30;
+    padding:7px 9px 8px;
+    border-right:0;
+    border-top:0;
+    border-bottom:1px solid var(--line);
+    background:rgba(255,255,255,.98);
+    box-shadow:0 7px 20px rgba(37,28,17,.07);
+  }
+  .brand{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:0 0 6px;
+    margin:0 0 5px;
+    border-bottom:1px solid var(--line);
+  }
+  .brand-logo{max-width:122px;max-height:47px}
+  .sidebar nav{
+    display:flex;
+    justify-content:flex-start;
+    gap:4px;
+    overflow-x:auto;
+    overscroll-behavior-inline:contain;
+    scrollbar-width:none;
+    padding-bottom:1px;
+  }
+  .sidebar nav::-webkit-scrollbar{display:none}
+  .nav-btn{
+    flex:0 0 auto;
+    justify-content:center;
+    padding:8px 10px;
+    font-size:15px;
+    gap:5px;
+    border-radius:10px;
+    white-space:nowrap;
+  }
+  .nav-btn span{display:block;font-size:10px}
+  .main{padding:132px 14px 42px}
+  .topbar{align-items:flex-start}
+  .topbar h1{font-size:27px}
+  .top-actions .badge{display:none}
+  .cards-4,.cards-3,.cards-2,.product-grid,.form-grid,.ingredient-panels{grid-template-columns:1fr}
+  .form-field.full{grid-column:auto}
+  .order-card{grid-template-columns:auto 1fr}
+  .order-card .actions{grid-column:1/-1}
+}
+
+.recipe-preview{margin:10px 0;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:#fcfbf9}
+.recipe-preview p{margin:5px 0 0;color:var(--muted);font-size:12px;line-height:1.4}
+.recipe-head{display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:12px}
+.recipe-head span{color:var(--muted)}
+.recipe-lines{display:grid;gap:4px;margin-top:8px;font-size:12px;color:#5f5a53}
+.recipe-lines span{display:flex;justify-content:space-between;gap:8px}
+.real-note{font-size:12px;color:var(--green);background:var(--green-soft);border:1px solid #c9dfcf;border-radius:10px;padding:9px 11px;margin:10px 0}
