@@ -5,7 +5,7 @@ const $=(q,r=document)=>r.querySelector(q), $$=(q,r=document)=>[...r.querySelect
 const money=v=>new Intl.NumberFormat('pt-PT',{style:'currency',currency:'EUR'}).format(Number(v||0));
 const dateFmt=d=>d?new Intl.DateTimeFormat('pt-PT',{day:'2-digit',month:'short',year:'numeric'}).format(new Date(String(d).slice(0,10)+'T12:00:00')):'—';
 const round=n=>Math.round((Number(n)+Number.EPSILON)*100)/100;
-const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#039;'}[m]));
+const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
 const ing=id=>data.ingredients.find(x=>Number(x.id)===Number(id));
 const comp=id=>data.components.find(x=>Number(x.id)===Number(id));
 const size=id=>data.sizes.find(x=>Number(x.id)===Number(id));
@@ -70,7 +70,7 @@ function savePrototypePreparation(id,actual,applyStock=true){
   let idx=store.orders.findIndex(o=>Number(o.id)===Number(id));
   let order=idx>=0?store.orders[idx]:data.orders.find(o=>Number(o.id)===Number(id));
   if(!order)throw new Error('Encomenda não encontrada.');
-  const consumption=(actual||[]).map(r=>({ingredient_id:Number(r.ingredient_id),predicted_qty:Number(r.predicted_qty??r.quantity||0),actual_qty:Number(r.quantity||0),unit:ing(r.ingredient_id)?.unit||''}));
+  const consumption=(actual||[]).map(r=>({ingredient_id:Number(r.ingredient_id),predicted_qty:Number((r.predicted_qty??r.quantity)||0),actual_qty:Number(r.quantity||0),unit:ing(r.ingredient_id)?.unit||''}));
   order={...order,status:'Aguarda recolha',stock_applied:Boolean(applyStock),consumption};
   if(idx>=0)store.orders[idx]=order;else store.orders.unshift(order);
   if(applyStock){
