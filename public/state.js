@@ -1,6 +1,5 @@
 let data={clients:[],ingredients:[],products:[],sizes:[],components:[],orders:[],expenses:[],movements:[],demoRecipes:false};
 let currentView='dashboard', productTab='products', databaseConnected=false;
-const PROTOTYPE_KEY='kipper_prototype_data_v1';
 const $=(q,r=document)=>r.querySelector(q), $$=(q,r=document)=>[...r.querySelectorAll(q)];
 const money=v=>new Intl.NumberFormat('pt-PT',{style:'currency',currency:'EUR'}).format(Number(v||0));
 const dateFmt=d=>d?new Intl.DateTimeFormat('pt-PT',{day:'2-digit',month:'short',year:'numeric'}).format(new Date(String(d).slice(0,10)+'T12:00:00')):'—';
@@ -12,99 +11,18 @@ const size=id=>data.sizes.find(x=>Number(x.id)===Number(id));
 const client=id=>data.clients.find(x=>Number(x.id)===Number(id));
 const product=id=>data.products.find(x=>Number(x.id)===Number(id));
 
-function readPrototypeStore(){
-  try{
-    const parsed=JSON.parse(localStorage.getItem(PROTOTYPE_KEY)||'{}');
-    return {
-      orders:Array.isArray(parsed.orders)?parsed.orders:[],
-      clients:Array.isArray(parsed.clients)?parsed.clients:[],
-      stockByIngredient:parsed.stockByIngredient&&typeof parsed.stockByIngredient==='object'?parsed.stockByIngredient:{},
-      movements:Array.isArray(parsed.movements)?parsed.movements:[],
-      expenses:Array.isArray(parsed.expenses)?parsed.expenses:[]
-    };
-  }catch{return {orders:[],clients:[],stockByIngredient:{},movements:[],expenses:[]}}
-}
-function writePrototypeStore(store){localStorage.setItem(PROTOTYPE_KEY,JSON.stringify(store))}
-function nextPrototypeId(items=[]){return Math.max(Date.now(),...items.map(x=>Number(x.id)||0))+1}
-function savePrototypeClient(body){
-  const store=readPrototypeStore();
-  const duplicate=store.clients.find(c=>body.contact&&c.contact===body.contact)||data.clients.find(c=>body.contact&&c.contact===body.contact);
-  if(duplicate)throw new Error(`Já existe um cliente com este contacto: ${duplicate.name}`);
-  const row={id:nextPrototypeId([...data.clients,...store.clients]),name:String(body.name||'').trim(),contact:String(body.contact||'').trim(),created_at:new Date().toISOString()};
-  if(!row.name)throw new Error('Nome obrigatório');
-  store.clients.push(row);writePrototypeStore(store);return row;
-}
-function savePrototypeOrder(body,id=null){
-  const store=readPrototypeStore();
-  let row;
-  if(id){
-    const idx=store.orders.findIndex(o=>Number(o.id)===Number(id));
-    const old=idx>=0?store.orders[idx]:data.orders.find(o=>Number(o.id)===Number(id));
-    if(!old)throw new Error('Encomenda não encontrada.');
-    row={...old,...body,id:Number(id),items:body.items||old.items||[]};
-    if(idx>=0)store.orders[idx]=row;else store.orders.unshift(row);
-  }else{
-    const newId=nextPrototypeId(store.orders);
-    row={id:newId,...body,status:'Registada',stock_applied:false,created_at:new Date().toISOString(),items:body.items||[]};
-    store.orders.unshift(row);
-  }
-  writePrototypeStore(store);return row;
-}
-function savePrototypeStockMovement(body){
-  const store=readPrototypeStore();
-  const ingredient=ing(body.ingredient_id);
-  const qty=Math.abs(Number(body.quantity)||0);
-  if(!ingredient||!qty)throw new Error('Movimento de stock inválido.');
-  const sign=body.movement_type==='Entrada'?1:-1;
-  const current=Number(ingredient.stock||0);
-  store.stockByIngredient[String(ingredient.id)]=round(current+(sign*qty));
-  const movement={id:nextPrototypeId(store.movements),ingredient_id:Number(ingredient.id),movement_type:body.movement_type,quantity:qty,cost:Number(body.cost||0),note:body.note||'',created_at:new Date().toISOString()};
-  store.movements.unshift(movement);
-  if(movement.cost>0){
-    store.expenses.unshift({id:nextPrototypeId(store.expenses),name:`Reposição de stock — ${ingredient.name}`,expense_type:'Pontual',value:movement.cost,expense_date:new Date().toISOString().slice(0,10)});
-  }
-  writePrototypeStore(store);return movement;
-}
-function savePrototypePreparation(id,actual,applyStock=true){
-  const store=readPrototypeStore();
-  let idx=store.orders.findIndex(o=>Number(o.id)===Number(id));
-  let order=idx>=0?store.orders[idx]:data.orders.find(o=>Number(o.id)===Number(id));
-  if(!order)throw new Error('Encomenda não encontrada.');
-  const consumption=(actual||[]).map(r=>({ingredient_id:Number(r.ingredient_id),predicted_qty:Number((r.predicted_qty??r.quantity)||0),actual_qty:Number(r.quantity||0),unit:ing(r.ingredient_id)?.unit||''}));
-  order={...order,status:'Aguarda recolha',stock_applied:Boolean(applyStock),consumption};
-  if(idx>=0)store.orders[idx]=order;else store.orders.unshift(order);
-  if(applyStock){
-    for(const r of consumption){
-      const ingredient=ing(r.ingredient_id);if(!ingredient)continue;
-      store.stockByIngredient[String(ingredient.id)]=round(Number(ingredient.stock||0)-Number(r.actual_qty||0));
-      store.movements.unshift({id:nextPrototypeId(store.movements),ingredient_id:Number(ingredient.id),movement_type:'Saída',quantity:Number(r.actual_qty||0),cost:0,note:`Encomenda ${id}`,order_id:Number(id),created_at:new Date().toISOString()});
-    }
-  }
-  writePrototypeStore(store);return order;
-}
-function setPrototypeOrderStatus(id,status,restoreStock=false){
-  const store=readPrototypeStore();
-  let idx=store.orders.findIndex(o=>Number(o.id)===Number(id));
-  let order=idx>=0?store.orders[idx]:data.orders.find(o=>Number(o.id)===Number(id));
-  if(!order)throw new Error('Encomenda não encontrada.');
-  if(restoreStock&&order.stock_applied){
-    for(const r of order.consumption||[]){
-      const ingredient=ing(r.ingredient_id);if(!ingredient)continue;
-      store.stockByIngredient[String(ingredient.id)]=round(Number(ingredient.stock||0)+Number(r.actual_qty||0));
-      store.movements.unshift({id:nextPrototypeId(store.movements),ingredient_id:Number(ingredient.id),movement_type:'Entrada',quantity:Number(r.actual_qty||0),cost:0,note:'Reposição por cancelamento',order_id:Number(id),created_at:new Date().toISOString()});
-    }
-  }
-  order={...order,status};
-  if(idx>=0)store.orders[idx]=order;else store.orders.unshift(order);
-  writePrototypeStore(store);return order;
-}
-function mergePrototypeData(base){
-  const store=readPrototypeStore();
-  const clients=[...(base.clients||[])];
-  for(const c of store.clients)if(!clients.some(x=>Number(x.id)===Number(c.id)))clients.push(c);
-  const ingredients=(base.ingredients||[]).map(i=>({...i,stock:Object.prototype.hasOwnProperty.call(store.stockByIngredient,String(i.id))?store.stockByIngredient[String(i.id)]:i.stock}));
-  return {...base,clients,ingredients,orders:[...store.orders],movements:[...store.movements,...(base.movements||[])],expenses:[...store.expenses,...(base.expenses||[])]};
-}
+// A Kipper nunca cria nem guarda dados de demonstração/localmente.
+// Se a base de dados estiver indisponível, qualquer tentativa de escrita falha explicitamente.
+function prototypeDisabled(){throw new Error('A base de dados está indisponível. Os dados não foram guardados.')}
+function savePrototypeClient(){return prototypeDisabled()}
+function savePrototypeOrder(){return prototypeDisabled()}
+function savePrototypeStockMovement(){return prototypeDisabled()}
+function savePrototypePreparation(){return prototypeDisabled()}
+function setPrototypeOrderStatus(){return prototypeDisabled()}
+function readPrototypeStore(){return {orders:[],clients:[],stockByIngredient:{},movements:[],expenses:[]}}
+function writePrototypeStore(){return false}
+function nextPrototypeId(){return Date.now()}
+function mergePrototypeData(base){return base}
 
 async function api(url,opts={}){
   const r=await fetch(url,{headers:{'Content-Type':'application/json',...(opts.headers||{})},...opts});
@@ -112,11 +30,10 @@ async function api(url,opts={}){
   return r.json();
 }
 async function reload(){
-  const loaded=await api('/api/bootstrap');
-  const h=await api('/api/health');
+  const [loaded,h]=await Promise.all([api('/api/bootstrap'),api('/api/health')]);
   databaseConnected=Boolean(h.database);
-  if(!databaseConnected && !(loaded.products||[]).length && window.KIPPER_DEMO){data=mergePrototypeData(structuredClone(window.KIPPER_DEMO));}else data=loaded;
-  $('#dbStatus').textContent=databaseConnected?'Base de dados ligada':'Modo protótipo · dados guardados neste dispositivo';
+  data=loaded||{clients:[],ingredients:[],products:[],sizes:[],components:[],orders:[],expenses:[],movements:[],demoRecipes:false};
+  $('#dbStatus').textContent=databaseConnected?'Base de dados ligada':'Base de dados indisponível';
   $('#dbStatus').className='badge '+(databaseConnected?'':'demo');
   render();
 }
