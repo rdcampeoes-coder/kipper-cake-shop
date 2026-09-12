@@ -12,15 +12,6 @@ export const supabaseAdmin = authConfigured
   ? createClient(supabaseUrl, secretKey, { auth: { persistSession: false, autoRefreshToken: false } })
   : null;
 
-export function publicAuthConfig(){
-  return {
-    enabled: authConfigured,
-    accessControlEnabled,
-    url: supabaseUrl || null,
-    publishableKey: publishableKey || null
-  };
-}
-
 export async function resolveUserFromRequest(req){
   if(!authConfigured) return null;
   const header = String(req.headers.authorization || '');
@@ -36,7 +27,7 @@ export async function ensureProfile(user){
   if(!user || !supabaseAdmin) return null;
   const email = String(user.email || '').toLowerCase();
   const adminEmail = String(process.env.ADMIN_EMAIL || '').toLowerCase();
-  const isBootstrapAdmin = adminEmail && email === adminEmail;
+  const isBootstrapAdmin = Boolean(adminEmail && email === adminEmail);
   const payload = { id: user.id, email: user.email || null, updated_at: new Date().toISOString() };
   if(isBootstrapAdmin) payload.is_admin = true;
   const { error } = await supabaseAdmin.from('profiles').upsert(payload, { onConflict: 'id' });
@@ -70,7 +61,7 @@ export async function attachCurrentUser(req, res, next){
 }
 
 export function requireAuthenticated(req, res, next){
-  if(!accessControlEnabled) return next();
+  if(!authConfigured) return res.status(503).json({ error: 'Autenticação ainda não está configurada' });
   if(!req.currentUser) return res.status(401).json({ error: 'Sessão necessária' });
   next();
 }
@@ -83,7 +74,7 @@ export function requirePaidAccess(req, res, next){
 }
 
 export function requireAdmin(req, res, next){
-  if(!accessControlEnabled) return res.status(503).json({ error: 'Controlo de acesso ainda não está ativo' });
+  if(!authConfigured) return res.status(503).json({ error: 'Autenticação ainda não está configurada' });
   if(!req.currentUser) return res.status(401).json({ error: 'Sessão necessária' });
   if(!req.currentProfile?.is_admin) return res.status(403).json({ error: 'Acesso de administrador necessário' });
   next();
