@@ -2,7 +2,7 @@ import Stripe from 'stripe';
 import { billingConfigured, authConfigured, accessControlEnabled, requireAuthenticated, requireAdmin, supabaseAdmin } from './access.js';
 
 const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY) : null;
-const appUrl = () => String(process.env.APP_URL || '').replace(/\/$/, '');
+const appUrl = () => String(process.env.APP_URL || process.env.RENDER_EXTERNAL_URL || '').replace(/\/$/, '');
 
 async function updateProfileByCustomer(customerId, patch){
   if(!supabaseAdmin || !customerId) return;
