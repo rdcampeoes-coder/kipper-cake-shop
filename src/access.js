@@ -23,18 +23,68 @@ export async function resolveUserFromRequest(req){
   return data.user;
 }
 
+async function createWorkspaceForUser(user){
+  const { data: workspace, error: workspaceError } = await supabaseAdmin
+    .from('workspaces')
+    .insert({ name: 'O meu negócio', owner_user_id: user.id })
+    .select('id')
+    .single();
+  if(workspaceError) throw workspaceError;
+
+  const { error: memberError } = await supabaseAdmin
+    .from('workspace_members')
+    .upsert({ workspace_id: workspace.id, user_id: user.id, role: 'owner' }, { onConflict: 'workspace_id,user_id' });
+  if(memberError) throw memberError;
+
+  return workspace.id;
+}
+
 export async function ensureProfile(user){
   if(!user || !supabaseAdmin) return null;
   const email = String(user.email || '').toLowerCase();
   const adminEmail = String(process.env.ADMIN_EMAIL || '').toLowerCase();
   const isBootstrapAdmin = Boolean(adminEmail && email === adminEmail);
-  const payload = { id: user.id, email: user.email || null, updated_at: new Date().toISOString() };
-  if(isBootstrapAdmin) payload.is_admin = true;
-  const { error } = await supabaseAdmin.from('profiles').upsert(payload, { onConflict: 'id' });
-  if(error) throw error;
-  const { data, error: readError } = await supabaseAdmin.from('profiles').select('*').eq('id', user.id).single();
+
+  let { data: profile, error: readError } = await supabaseAdmin
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .maybeSingle();
   if(readError) throw readError;
-  return data;
+
+  if(!profile){
+    const workspaceId = await createWorkspaceForUser(user);
+    const payload = {
+      id: user.id,
+      email: user.email || null,
+      current_workspace_id: workspaceId,
+      is_admin: isBootstrapAdmin,
+      updated_at: new Date().toISOString()
+    };
+    const { data, error } = await supabaseAdmin.from('profiles').insert(payload).select('*').single();
+    if(error) throw error;
+    profile = data;
+  }else{
+    const patch = { email: user.email || null, updated_at: new Date().toISOString() };
+    if(isBootstrapAdmin) patch.is_admin = true;
+    if(!profile.current_workspace_id) patch.current_workspace_id = await createWorkspaceForUser(user);
+    const { data, error } = await supabaseAdmin.from('profiles').update(patch).eq('id', user.id).select('*').single();
+    if(error) throw error;
+    profile = data;
+  }
+
+  if(profile?.current_workspace_id){
+    const { data: membership, error: membershipError } = await supabaseAdmin
+      .from('workspace_members')
+      .select('role')
+      .eq('workspace_id', profile.current_workspace_id)
+      .eq('user_id', user.id)
+      .maybeSingle();
+    if(membershipError) throw membershipError;
+    if(!membership) throw new Error('O utilizador não pertence ao workspace selecionado.');
+  }
+
+  return profile;
 }
 
 export function hasManualAccess(profile){
@@ -56,6 +106,7 @@ export async function attachCurrentUser(req, res, next){
     const user = await resolveUserFromRequest(req);
     req.currentUser = user;
     req.currentProfile = user ? await ensureProfile(user) : null;
+    req.workspaceId = req.currentProfile?.current_workspace_id || null;
     next();
   }catch(err){ next(err); }
 }
@@ -63,13 +114,21 @@ export async function attachCurrentUser(req, res, next){
 export function requireAuthenticated(req, res, next){
   if(!authConfigured) return res.status(503).json({ error: 'Autenticação ainda não está configurada' });
   if(!req.currentUser) return res.status(401).json({ error: 'Sessão necessária' });
+  if(!req.workspaceId) return res.status(403).json({ error: 'Workspace não configurado' });
   next();
 }
 
 export function requirePaidAccess(req, res, next){
   if(!accessControlEnabled) return next();
   if(!req.currentUser) return res.status(401).json({ error: 'Sessão necessária' });
+  if(!req.workspaceId) return res.status(403).json({ error: 'Workspace não configurado' });
   if(!profileHasAccess(req.currentProfile)) return res.status(402).json({ error: 'Subscrição necessária', code: 'subscription_required' });
+  next();
+}
+
+export function requireWorkspace(req, res, next){
+  if(!accessControlEnabled) return next();
+  if(!req.workspaceId) return res.status(403).json({ error: 'Workspace não configurado' });
   next();
 }
 
