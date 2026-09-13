@@ -1,15 +1,22 @@
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import Stripe from 'stripe';
 import { pool, hasDatabase, initDatabase } from './db.js';
 import { registerCoreRoutes } from './core-routes.js';
 import { registerOrderRoutes } from './order-routes.js';
+import { registerBillingRoutes,registerStripeWebhook,authMiddleware,requirePaidAccess } from './auth-billing.js';
 
 const app=express();
+const stripe=process.env.STRIPE_SECRET_KEY?new Stripe(process.env.STRIPE_SECRET_KEY):null;
 const __dirname=path.dirname(fileURLToPath(import.meta.url));
 const publicDir=path.resolve(__dirname,'..','public');
-app.use(express.json({limit:'1mb'}));
+
+registerStripeWebhook(app,pool,stripe);
+app.use(express.json({limit:'2mb'}));
 app.use(express.static(publicDir));
+registerBillingRoutes(app,pool,stripe);
+app.use('/api',authMiddleware(pool),requirePaidAccess(pool));
 registerCoreRoutes(app,pool,hasDatabase);
 registerOrderRoutes(app,pool);
 app.get('*',(req,res)=>res.sendFile(path.join(publicDir,'index.html')));
