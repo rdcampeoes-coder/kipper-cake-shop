@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Kipper App">
+  <defs>
+    <linearGradient id="blue" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1557ff"/>
+      <stop offset="1" stop-color="#10d7e8"/>
+    </linearGradient>
+    <linearGradient id="pink" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ff8ea8"/>
+      <stop offset="1" stop-color="#f5a5b8"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="96" fill="#fff"/>
+  <path d="M255 76l42 84 93 14-67 65 16 92-84-44-84 44 16-92-67-65 93-14z" fill="none" stroke="url(#blue)" stroke-width="25" stroke-linejoin="round"/>
+  <path d="M108 264c70-45 199-40 292 24-80-19-169-13-267 28-28 12-45-29-25-52z" fill="url(#pink)"/>
+  <path d="M145 330h222l-26 112c-4 18-20 30-38 30h-94c-18 0-34-12-38-30z" fill="url(#blue)"/>
+  <path d="M213 334v130M300 334v130" stroke="#fff" stroke-width="18" stroke-linecap="round" opacity=".9"/>
+</svg>

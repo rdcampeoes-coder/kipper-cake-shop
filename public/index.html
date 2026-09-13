@@ -3,18 +3,43 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#f7f4ef">
-  <title>Kipper Cake Shop</title>
+  <meta name="theme-color" content="#ffffff">
+  <meta name="application-name" content="Kipper App">
+  <meta name="description" content="Kipper App — aplicação de gestão desenvolvida pela Starta com o apoio da Kipper.">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Kipper App">
+  <title>Kipper App</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
   <link rel="stylesheet" href="/style.css">
   <link rel="stylesheet" href="/mobile-top-nav.css">
   <link rel="stylesheet" href="/v3.css">
   <link rel="stylesheet" href="/v4-round.css">
   <link rel="stylesheet" href="/v5-round.css">
+  <style>
+    .brand{justify-content:center}
+    .brand-lockup{display:grid;grid-template-columns:54px 1fr;gap:10px;align-items:center;width:100%}
+    .brand-lockup img{display:block;width:54px;height:54px;border-radius:14px;object-fit:cover}
+    .brand-name{font-weight:800;letter-spacing:.12em;font-size:14px;line-height:1.15;background:linear-gradient(90deg,#1557ff,#10cfe3);-webkit-background-clip:text;background-clip:text;color:transparent;white-space:nowrap}
+    .brand-by{margin-top:5px;font-size:9px;letter-spacing:.2em;color:#777168;white-space:nowrap}
+    .brand-by strong{color:#1557ff;font-weight:800}
+    @media(max-width:1050px) and (min-width:721px){
+      .brand-lockup{display:block}.brand-lockup img{margin:auto;width:48px;height:48px}.brand-copy{display:none}
+    }
+  </style>
 </head>
 <body>
 <div id="app">
   <aside class="sidebar">
-    <div class="brand"><img class="brand-logo" src="/kipper-logo.jpg" alt="Kipper Cake Shop"></div>
+    <div class="brand">
+      <div class="brand-lockup" aria-label="Kipper App by Starta">
+        <img src="/icons/icon-192.png" alt="Kipper App">
+        <div class="brand-copy"><div class="brand-name">KIPPER APP</div><div class="brand-by">by <strong>STARTA</strong></div></div>
+      </div>
+    </div>
     <nav>
       <button class="nav-btn active" data-view="dashboard">⌂ <span>Início</span></button>
       <button class="nav-btn" data-view="orders">◫ <span>Encomendas</span></button>
@@ -49,5 +74,12 @@
 <script src="/v4-round.js"></script>
 <script src="/v5-round.js"></script>
 <script src="/admin-management.js"></script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').catch(error => console.warn('PWA service worker:', error));
+    });
+  }
+</script>
 </body>
 </html>
