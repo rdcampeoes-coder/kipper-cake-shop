@@ -1,6 +1,7 @@
 import express from 'express';
 
 const activeStatuses=new Set(['active','trialing']);
+const isAdminEmail=email=>Boolean(process.env.ADMIN_EMAIL&&String(email||'').toLowerCase()===process.env.ADMIN_EMAIL.toLowerCase());
 
 async function fetchSupabaseUser(token){
   const url=process.env.SUPABASE_URL;
@@ -32,6 +33,7 @@ export function authMiddleware(pool){
 export function requirePaidAccess(pool){
   return async(req,res,next)=>{
     try{
+      if(isAdminEmail(req.user?.email))return next();
       if(!pool)return res.status(503).json({error:'Base de dados não configurada'});
       const {rows}=await pool.query('SELECT subscription_status,free_access FROM app_users WHERE user_id=$1',[req.user.id]);
       const row=rows[0];
@@ -43,6 +45,11 @@ export function requirePaidAccess(pool){
 
 export function registerBillingRoutes(app,pool,stripe){
   const auth=authMiddleware(pool);
+  const requireAdmin=(req,res)=>{
+    if(isAdminEmail(req.user?.email))return true;
+    res.status(403).json({error:'Sem permissão'});
+    return false;
+  };
 
   app.get('/api/auth/config',(req,res)=>res.json({
     supabaseUrl:process.env.SUPABASE_URL||'',
@@ -53,8 +60,8 @@ export function registerBillingRoutes(app,pool,stripe){
   app.get('/api/account',auth,async(req,res,next)=>{try{
     const {rows}=await pool.query('SELECT email,subscription_status,free_access,stripe_customer_id,stripe_subscription_id FROM app_users WHERE user_id=$1',[req.user.id]);
     const a=rows[0]||{};
-    const isAdmin=Boolean(process.env.ADMIN_EMAIL&&req.user.email.toLowerCase()===process.env.ADMIN_EMAIL.toLowerCase());
-    res.json({email:req.user.email,status:a.subscription_status||'inactive',freeAccess:!!a.free_access,hasAccess:!!a.free_access||activeStatuses.has(a.subscription_status),hasStripeCustomer:!!a.stripe_customer_id,isAdmin});
+    const isAdmin=isAdminEmail(req.user.email);
+    res.json({email:req.user.email,status:a.subscription_status||'inactive',freeAccess:!!a.free_access,hasAccess:isAdmin||!!a.free_access||activeStatuses.has(a.subscription_status),hasStripeCustomer:!!a.stripe_customer_id,isAdmin});
   }catch(e){next(e)}});
 
   app.post('/api/billing/checkout',auth,async(req,res,next)=>{try{
@@ -89,12 +96,49 @@ export function registerBillingRoutes(app,pool,stripe){
     res.json({url:session.url});
   }catch(e){next(e)}});
 
+  app.get('/api/admin/accounts',auth,async(req,res,next)=>{try{
+    if(!requireAdmin(req,res))return;
+    const {rows}=await pool.query(`SELECT user_id,email,subscription_status,free_access,
+      stripe_customer_id,stripe_subscription_id,created_at,updated_at
+      FROM app_users ORDER BY created_at DESC`);
+    const accounts=rows.map(row=>{
+      const admin=isAdminEmail(row.email);
+      const paid=activeStatuses.has(row.subscription_status);
+      const free=Boolean(row.free_access);
+      return {
+        userId:row.user_id,
+        email:row.email,
+        status:row.subscription_status||'inactive',
+        freeAccess:free,
+        paidAccess:paid,
+        hasAccess:admin||free||paid,
+        isAdmin:admin,
+        hasStripeCustomer:Boolean(row.stripe_customer_id),
+        hasStripeSubscription:Boolean(row.stripe_subscription_id),
+        createdAt:row.created_at,
+        updatedAt:row.updated_at
+      };
+    });
+    const customers=accounts.filter(a=>!a.isAdmin);
+    res.json({
+      summary:{
+        total:customers.length,
+        active:customers.filter(a=>a.hasAccess).length,
+        paid:customers.filter(a=>a.paidAccess).length,
+        free:customers.filter(a=>a.freeAccess).length,
+        inactive:customers.filter(a=>!a.hasAccess).length
+      },
+      accounts
+    });
+  }catch(e){next(e)}});
+
   app.post('/api/admin/free-access',auth,async(req,res,next)=>{try{
-    if(!process.env.ADMIN_EMAIL||req.user.email.toLowerCase()!==process.env.ADMIN_EMAIL.toLowerCase())return res.status(403).json({error:'Sem permissão'});
+    if(!requireAdmin(req,res))return;
     const email=String(req.body.email||'').trim().toLowerCase();
     const enabled=req.body.enabled!==false;
     if(!email)return res.status(400).json({error:'Email obrigatório'});
-    const {rows}=await pool.query('UPDATE app_users SET free_access=$1,updated_at=NOW() WHERE lower(email)=$2 RETURNING email,free_access',[enabled,email]);
+    if(isAdminEmail(email)&&!enabled)return res.status(400).json({error:'A conta de gestão mantém sempre acesso administrativo'});
+    const {rows}=await pool.query('UPDATE app_users SET free_access=$1,updated_at=NOW() WHERE lower(email)=$2 RETURNING email,free_access,subscription_status',[enabled,email]);
     if(!rows[0])return res.status(404).json({error:'Utilizador ainda não criou conta'});
     res.json(rows[0]);
   }catch(e){next(e)}});
