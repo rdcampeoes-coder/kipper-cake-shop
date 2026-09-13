@@ -53,7 +53,8 @@ export function registerBillingRoutes(app,pool,stripe){
   app.get('/api/account',auth,async(req,res,next)=>{try{
     const {rows}=await pool.query('SELECT email,subscription_status,free_access,stripe_customer_id,stripe_subscription_id FROM app_users WHERE user_id=$1',[req.user.id]);
     const a=rows[0]||{};
-    res.json({email:req.user.email,status:a.subscription_status||'inactive',freeAccess:!!a.free_access,hasAccess:!!a.free_access||activeStatuses.has(a.subscription_status),hasStripeCustomer:!!a.stripe_customer_id});
+    const isAdmin=Boolean(process.env.ADMIN_EMAIL&&req.user.email.toLowerCase()===process.env.ADMIN_EMAIL.toLowerCase());
+    res.json({email:req.user.email,status:a.subscription_status||'inactive',freeAccess:!!a.free_access,hasAccess:!!a.free_access||activeStatuses.has(a.subscription_status),hasStripeCustomer:!!a.stripe_customer_id,isAdmin});
   }catch(e){next(e)}});
 
   app.post('/api/billing/checkout',auth,async(req,res,next)=>{try{
