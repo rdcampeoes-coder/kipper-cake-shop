@@ -11,9 +11,9 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Kipper App">
   <title>Kipper App</title>
-  <link rel="manifest" href="/manifest.webmanifest">
-  <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
-  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  <link rel="manifest" href="/manifest.webmanifest?v=3">
+  <link rel="icon" type="image/png" href="/icons/kipper-app-exact-180.png?v=3">
+  <link rel="apple-touch-icon" href="/icons/kipper-app-exact-180.png?v=3">
   <link rel="stylesheet" href="/style.css">
   <link rel="stylesheet" href="/mobile-top-nav.css">
   <link rel="stylesheet" href="/v3.css">
@@ -36,7 +36,7 @@
   <aside class="sidebar">
     <div class="brand">
       <div class="brand-lockup" aria-label="Kipper App by Starta">
-        <img src="/icons/icon-192.png" alt="Kipper App">
+        <img src="/icons/kipper-app-exact-180.png?v=3" alt="Kipper App">
         <div class="brand-copy"><div class="brand-name">KIPPER APP</div><div class="brand-by">by <strong>STARTA</strong></div></div>
       </div>
     </div>
@@ -77,7 +77,7 @@
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js').catch(error => console.warn('PWA service worker:', error));
+      navigator.serviceWorker.register('/sw.js?v=3').catch(error => console.warn('PWA service worker:', error));
     });
   }
 </script>
