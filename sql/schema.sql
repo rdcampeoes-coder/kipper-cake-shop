@@ -1,3 +1,14 @@
+CREATE TABLE IF NOT EXISTS app_users (
+  user_id UUID PRIMARY KEY,
+  email TEXT NOT NULL DEFAULT '',
+  stripe_customer_id TEXT UNIQUE,
+  stripe_subscription_id TEXT UNIQUE,
+  subscription_status TEXT NOT NULL DEFAULT 'inactive',
+  free_access BOOLEAN NOT NULL DEFAULT FALSE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 CREATE TABLE IF NOT EXISTS app_meta (
   key TEXT PRIMARY KEY,
   value TEXT NOT NULL
@@ -107,3 +118,23 @@ CREATE TABLE IF NOT EXISTS expenses (
   value NUMERIC(12,2) NOT NULL DEFAULT 0,
   expense_date DATE NOT NULL DEFAULT CURRENT_DATE
 );
+
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS user_id UUID;
+ALTER TABLE ingredients ADD COLUMN IF NOT EXISTS user_id UUID;
+ALTER TABLE products ADD COLUMN IF NOT EXISTS user_id UUID;
+ALTER TABLE components ADD COLUMN IF NOT EXISTS user_id UUID;
+ALTER TABLE sizes ADD COLUMN IF NOT EXISTS user_id UUID;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS user_id UUID;
+ALTER TABLE stock_movements ADD COLUMN IF NOT EXISTS user_id UUID;
+ALTER TABLE expenses ADD COLUMN IF NOT EXISTS user_id UUID;
+
+ALTER TABLE ingredients DROP CONSTRAINT IF EXISTS ingredients_name_key;
+ALTER TABLE sizes DROP CONSTRAINT IF EXISTS sizes_name_key;
+CREATE UNIQUE INDEX IF NOT EXISTS ingredients_user_name_key ON ingredients(user_id,name) WHERE user_id IS NOT NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS sizes_user_name_key ON sizes(user_id,name) WHERE user_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS clients_user_idx ON clients(user_id);
+CREATE INDEX IF NOT EXISTS products_user_idx ON products(user_id);
+CREATE INDEX IF NOT EXISTS components_user_idx ON components(user_id);
+CREATE INDEX IF NOT EXISTS orders_user_idx ON orders(user_id);
+CREATE INDEX IF NOT EXISTS expenses_user_idx ON expenses(user_id);
+CREATE INDEX IF NOT EXISTS movements_user_idx ON stock_movements(user_id);
