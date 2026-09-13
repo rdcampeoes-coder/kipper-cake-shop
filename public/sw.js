@@ -1,17 +1,18 @@
-const CACHE_NAME = 'kipper-app-v5';
+const CACHE_NAME = 'kipper-app-v6';
 const APP_SHELL = [
   '/',
   '/index.html',
-  '/manifest.webmanifest?v=5',
-  '/style.css?v=5',
-  '/mobile-top-nav.css?v=5',
-  '/v3.css?v=5',
-  '/v4-round.css?v=5',
-  '/v5-round.css?v=5',
-  '/auth-ui.js?v=5',
-  '/admin-management.js?v=5',
-  '/icons/kipper-app-exact-180.png?v=5',
-  '/icons/kipper-app-exact.svg?v=5'
+  '/manifest.webmanifest?v=6',
+  '/style.css?v=6',
+  '/mobile-top-nav.css?v=6',
+  '/v3.css?v=6',
+  '/v4-round.css?v=6',
+  '/v5-round.css?v=6',
+  '/auth-ui.js?v=6',
+  '/admin-management.js?v=6',
+  '/icons/kipper-app-header.jpg?v=6',
+  '/icons/kipper-app-exact-180.png?v=6',
+  '/icons/kipper-app-exact.svg?v=6'
 ];
 
 self.addEventListener('install', event => {
