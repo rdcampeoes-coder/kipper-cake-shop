@@ -1,6 +1,20 @@
 (()=>{
-  let client=null,session=null,config=null,account=null,selectedPlan='monthly';
-  const css=`<style id="authCss">.auth-screen{position:fixed;inset:0;z-index:99999;background:#f7f4ef;display:flex;align-items:center;justify-content:center;padding:24px;font-family:Arial,sans-serif}.auth-card{width:min(470px,100%);background:white;border:1px solid #e5dfd4;border-radius:24px;padding:28px;box-shadow:0 18px 60px #00000012}.auth-card h1{margin:0 0 6px;font-family:Georgia,serif;font-size:32px}.auth-card p{color:#6e675e;line-height:1.5}.auth-card input,.auth-card textarea{width:100%;box-sizing:border-box;padding:13px 14px;margin:7px 0;border:1px solid #d9d2c7;border-radius:12px;font-size:16px}.auth-card textarea{min-height:92px;resize:vertical}.auth-card button{width:100%;padding:13px 16px;margin-top:10px;border:0;border-radius:12px;font-weight:700;cursor:pointer}.auth-primary{background:#1f1d1a;color:white}.auth-secondary{background:#eee9e1;color:#1f1d1a}.auth-link{background:transparent!important;color:#725a2b!important}.auth-msg{min-height:22px;color:#8b2f2f;font-size:14px;margin-top:8px}.auth-price{font-size:30px;font-weight:800;margin:14px 0;color:#1f1d1a}.auth-account{position:fixed;right:14px;bottom:14px;z-index:9990;background:#fff;border:1px solid #e5dfd4;border-radius:14px;padding:8px 10px;box-shadow:0 5px 18px #0001;font-size:12px}.auth-account button{border:0;background:transparent;text-decoration:underline;cursor:pointer;font-size:12px}.plan-card{border:2px solid #1f1d1a;border-radius:18px;padding:18px;margin:16px 0}.plan-card h3{margin:0 0 6px;font-size:20px}.plan-card .price{font-size:30px;font-weight:800;margin:8px 0}.plan-card ul{padding-left:20px;color:#6e675e;line-height:1.6}.auth-note{font-size:13px;color:#7f776d;line-height:1.45}</style>`;
+  let client=null,session=null,config=null,account=null,selectedPlan='premium';
+  const css=`<style id="authCss">
+    .auth-screen{position:fixed;inset:0;z-index:99999;background:#f7f4ef;display:flex;align-items:center;justify-content:center;padding:24px;font-family:Arial,sans-serif}
+    .auth-card{width:min(470px,100%);background:white;border:1px solid #e5dfd4;border-radius:24px;padding:28px;box-shadow:0 18px 60px #00000012}
+    .auth-card h1{margin:0 0 6px;font-family:Georgia,serif;font-size:32px}
+    .auth-card p{color:#6e675e;line-height:1.5}
+    .auth-card input,.auth-card textarea{width:100%;box-sizing:border-box;padding:13px 14px;margin:7px 0;border:1px solid #d9d2c7;border-radius:12px;font-size:16px}
+    .auth-card textarea{min-height:92px;resize:vertical}
+    .auth-card button{width:100%;padding:13px 16px;margin-top:10px;border:0;border-radius:12px;font-weight:700;cursor:pointer}
+    .auth-primary{background:#1f1d1a;color:white}.auth-secondary{background:#eee9e1;color:#1f1d1a}.auth-link{background:transparent!important;color:#725a2b!important}
+    .auth-msg{min-height:22px;color:#8b2f2f;font-size:14px;margin-top:8px}.auth-price{font-size:30px;font-weight:800;margin:14px 0;color:#1f1d1a}
+    .auth-account{position:fixed;right:14px;bottom:14px;z-index:9990;background:#fff;border:1px solid #e5dfd4;border-radius:14px;padding:8px 10px;box-shadow:0 5px 18px #0001;font-size:12px}
+    .auth-account button{border:0;background:transparent;text-decoration:underline;cursor:pointer;font-size:12px}
+    .plan-card{border:2px solid #1f1d1a;border-radius:18px;padding:18px;margin:16px 0}.plan-card h3{margin:0 0 6px;font-size:20px}.plan-card .price{font-size:30px;font-weight:800;margin:8px 0}
+    .plan-card ul{padding-left:20px;color:#6e675e;line-height:1.6}.auth-note{font-size:13px;color:#7f776d;line-height:1.45}
+  </style>`;
   document.head.insertAdjacentHTML('beforeend',css);
   const esc=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const appUrl=()=>`${location.origin}/`;
@@ -10,7 +24,7 @@
   async function request(url,opts={}){const token=session?.access_token;const r=await fetch(url,{...opts,headers:{'Content-Type':'application/json',...(token?{Authorization:`Bearer ${token}`}:{}) ,...(opts.headers||{})}});let j={};try{j=await r.json()}catch{}if(!r.ok)throw Object.assign(new Error(j.error||`Erro ${r.status}`),{status:r.status,body:j});return j}
 
   function showLogin(prefill=''){
-    const el=mount(`<h1>Kipper Cake Shop</h1><p>Entra na tua conta para aceder à aplicação.</p><input id="authEmail" type="email" placeholder="Email" autocomplete="email" value="${esc(prefill)}"><input id="authPass" type="password" placeholder="Palavra-passe" autocomplete="current-password"><div id="authMsg" class="auth-msg"></div><button id="authLogin" class="auth-primary">Entrar</button><button id="authForgot" class="auth-link">Esqueci-me da palavra-passe</button><button id="authRegister" class="auth-secondary">Criar conta</button>`);
+    const el=mount(`<h1>Kipper App</h1><p>Entra na tua conta para aceder à aplicação.</p><input id="authEmail" type="email" placeholder="Email" autocomplete="email" value="${esc(prefill)}"><input id="authPass" type="password" placeholder="Palavra-passe" autocomplete="current-password"><div id="authMsg" class="auth-msg"></div><button id="authLogin" class="auth-primary">Entrar</button><button id="authForgot" class="auth-link">Esqueci-me da palavra-passe</button><button id="authRegister" class="auth-secondary">Criar conta</button>`);
     el.querySelector('#authLogin').onclick=async()=>{message('A entrar…');const {data,error}=await client.auth.signInWithPassword({email:el.querySelector('#authEmail').value.trim(),password:el.querySelector('#authPass').value});if(error){message(error.message==='Invalid login credentials'?'Email ou palavra-passe incorretos. Podes redefinir a palavra-passe abaixo.':error.message);return}session=data.session;await afterLogin()};
     el.querySelector('#authForgot').onclick=()=>showForgot(el.querySelector('#authEmail').value.trim());
     el.querySelector('#authRegister').onclick=showPlans;
@@ -18,19 +32,32 @@
 
   function showPlans(){
     const label=config?.priceLabel||'15 €/mês';
-    const el=mount(`<h1>Escolhe o teu plano</h1><p>Seleciona o plano antes de criares a conta.</p><div class="plan-card"><h3>Plano Mensal</h3><div class="price">${label}</div><ul><li>Acesso completo à aplicação</li><li>Clientes, encomendas, receitas e stock</li><li>Finanças e histórico</li><li>Cancelamento através do portal Stripe</li></ul><button id="chooseMonthly" class="auth-primary">Escolher Plano Mensal</button></div><div class="auth-note">Neste momento existe um plano comercial configurado. A estrutura fica preparada para acrescentar outros planos.</div><button id="backLogin" class="auth-link">Já tenho conta</button>`);
-    el.querySelector('#chooseMonthly').onclick=()=>{selectedPlan='monthly';showRegister()};
+    const el=mount(`<h1>Escolhe o teu plano</h1><p>Seleciona o plano antes de criares a conta.</p><div class="plan-card"><h3>Premium</h3><div class="price">${label}</div><ul><li>Acesso completo à aplicação</li><li>Clientes, encomendas, receitas e stock</li><li>Finanças e histórico</li><li>Cancelamento através do portal Stripe</li></ul><button id="choosePremium" class="auth-primary">Escolher Premium</button></div><div class="auth-note">Neste momento o Premium é o plano com acesso total. A estrutura fica preparada para novos patamares no futuro.</div><button id="backLogin" class="auth-link">Já tenho conta</button>`);
+    el.querySelector('#choosePremium').onclick=()=>{selectedPlan='premium';showRegister()};
     el.querySelector('#backLogin').onclick=()=>showLogin();
   }
 
   function showRegister(){
-    const el=mount(`<h1>Criar conta</h1><p>Plano selecionado: <strong>${config?.priceLabel||'15 €/mês'}</strong></p><input id="regEmail" type="email" placeholder="Email" autocomplete="email"><input id="regPass" type="password" placeholder="Palavra-passe" autocomplete="new-password"><input id="regPass2" type="password" placeholder="Repetir palavra-passe" autocomplete="new-password"><div id="authMsg" class="auth-msg"></div><button id="finishRegister" class="auth-primary">Criar conta</button><button id="changePlan" class="auth-secondary">Voltar aos planos</button><button id="backLogin" class="auth-link">Já tenho conta</button>`);
-    el.querySelector('#finishRegister').onclick=async()=>{const email=el.querySelector('#regEmail').value.trim(),password=el.querySelector('#regPass').value,password2=el.querySelector('#regPass2').value;if(!email)return message('Indica o teu email.');if(password.length<6)return message('A palavra-passe precisa de pelo menos 6 caracteres.');if(password!==password2)return message('As palavras-passe não coincidem.');message('A criar conta…');const {data,error}=await client.auth.signUp({email,password,options:{emailRedirectTo:appUrl(),data:{plan:selectedPlan}}});if(error)return message(error.message);if(!data.session)return showConfirmEmail(email);session=data.session;await afterLogin()};
+    const el=mount(`<h1>Criar conta</h1><p>Plano selecionado: <strong>Premium · ${config?.priceLabel||'15 €/mês'}</strong></p><input id="regEmail" type="email" placeholder="Email" autocomplete="email"><input id="regPass" type="password" placeholder="Palavra-passe" autocomplete="new-password"><input id="regPass2" type="password" placeholder="Repetir palavra-passe" autocomplete="new-password"><input id="regReferral" type="text" maxlength="8" placeholder="Código de referência (opcional)"><div class="auth-note">Os códigos de referência têm o formato KIP + 5 caracteres.</div><div id="authMsg" class="auth-msg"></div><button id="finishRegister" class="auth-primary">Criar conta</button><button id="changePlan" class="auth-secondary">Voltar aos planos</button><button id="backLogin" class="auth-link">Já tenho conta</button>`);
+    const referral=el.querySelector('#regReferral');
+    referral.oninput=()=>{referral.value=referral.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,8)};
+    el.querySelector('#finishRegister').onclick=async()=>{
+      const email=el.querySelector('#regEmail').value.trim(),password=el.querySelector('#regPass').value,password2=el.querySelector('#regPass2').value,referralCode=referral.value.trim().toUpperCase();
+      if(!email)return message('Indica o teu email.');
+      if(password.length<6)return message('A palavra-passe precisa de pelo menos 6 caracteres.');
+      if(password!==password2)return message('As palavras-passe não coincidem.');
+      if(referralCode&&!/^KIP[A-Z0-9]{5}$/.test(referralCode))return message('O código deve ter KIP + 5 caracteres.');
+      message('A criar conta…');
+      const {data,error}=await client.auth.signUp({email,password,options:{emailRedirectTo:appUrl(),data:{plan:selectedPlan,referral_code:referralCode||undefined}}});
+      if(error)return message(error.message);
+      if(!data.session)return showConfirmEmail(email);
+      session=data.session;await afterLogin()
+    };
     el.querySelector('#changePlan').onclick=showPlans;el.querySelector('#backLogin').onclick=()=>showLogin();
   }
 
   function showConfirmEmail(email){
-    const el=mount(`<h1>Confirma o teu email</h1><p>Enviámos uma mensagem para <strong>${esc(email)}</strong>.</p><p>Carrega no botão de confirmação do email. Depois da confirmação voltas automaticamente à Kipper.</p><div id="authMsg" class="auth-msg"></div><button id="confirmedLogin" class="auth-secondary">Voltar ao login</button>`);
+    const el=mount(`<h1>Confirma o teu email</h1><p>Enviámos uma mensagem para <strong>${esc(email)}</strong>.</p><p>Carrega no botão de confirmação do email. Depois da confirmação voltas automaticamente à Kipper App.</p><div id="authMsg" class="auth-msg"></div><button id="confirmedLogin" class="auth-secondary">Voltar ao login</button>`);
     el.querySelector('#confirmedLogin').onclick=()=>showLogin(email);
   }
 
@@ -41,7 +68,7 @@
   }
 
   function showRecoverySent(email){
-    const el=mount(`<h1>Email enviado</h1><p>Enviámos um link de recuperação para <strong>${esc(email)}</strong>.</p><p>Abre o email e carrega no botão. Voltas automaticamente à Kipper para escolheres uma nova palavra-passe.</p><button id="backLogin" class="auth-link">Voltar ao login</button>`);
+    const el=mount(`<h1>Email enviado</h1><p>Enviámos um link de recuperação para <strong>${esc(email)}</strong>.</p><p>Abre o email e carrega no botão. Voltas automaticamente à Kipper App para escolheres uma nova palavra-passe.</p><button id="backLogin" class="auth-link">Voltar ao login</button>`);
     el.querySelector('#backLogin').onclick=()=>showLogin(email);
   }
 
@@ -50,11 +77,52 @@
     el.querySelector('#saveNewPass').onclick=async()=>{const p=el.querySelector('#newPass').value,p2=el.querySelector('#newPass2').value;if(p.length<6)return message('A palavra-passe precisa de pelo menos 6 caracteres.');if(p!==p2)return message('As palavras-passe não coincidem.');message('A guardar…');const {error}=await client.auth.updateUser({password:p});if(error)return message(error.message);history.replaceState({},document.title,location.pathname);message('Palavra-passe alterada. A entrar…');setTimeout(afterLogin,600)};
   }
 
-  function showPaywall(){const label=config?.priceLabel||'15 €/mês';const el=mount(`<h1>A tua subscrição</h1><p>Para utilizar a Kipper Cake Shop, ativa a mensalidade. O pagamento é processado de forma segura pelo Stripe.</p><div class="auth-price">${label}</div><div id="authMsg" class="auth-msg"></div><button id="authSubscribe" class="auth-primary">Subscrever agora</button>${account?.hasStripeCustomer?'<button id="authPortal" class="auth-secondary">Gerir subscrição</button>':''}<button id="authLogout" class="auth-link">Terminar sessão</button>`);el.querySelector('#authSubscribe').onclick=async()=>{try{message('A abrir pagamento…');const x=await request('/api/billing/checkout',{method:'POST',body:JSON.stringify({plan:selectedPlan})});location.href=x.url}catch(e){message(e.message)}};el.querySelector('#authPortal')?.addEventListener('click',async()=>{try{const x=await request('/api/billing/portal',{method:'POST'});location.href=x.url}catch(e){message(e.message)}});el.querySelector('#authLogout').onclick=async()=>{await client.auth.signOut();session=null;account=null;showLogin()}}
-  async function complimentaryAccess(){const email=prompt('Email da conta que queres oferecer acesso gratuito:');if(!email)return;const enabled=confirm('OK = ativar acesso gratuito.\nCancelar = remover acesso gratuito.');try{const r=await request('/api/admin/free-access',{method:'POST',body:JSON.stringify({email,enabled})});alert(`${r.email}: acesso gratuito ${r.free_access?'ativado':'removido'}.`)}catch(e){alert(e.message)}}
-  function accountChip(){document.getElementById('authAccount')?.remove();const d=document.createElement('div');d.id='authAccount';d.className='auth-account';d.innerHTML=`${esc(session?.user?.email||'')} · <button id="billingManage">Subscrição</button>${account?.isAdmin?' · <button id="freeAccessManage">Acesso grátis</button>':''} · <button id="logoutMini">Sair</button>`;document.body.appendChild(d);d.querySelector('#logoutMini').onclick=async()=>{await client.auth.signOut();session=null;showLogin();d.remove()};d.querySelector('#billingManage').onclick=async()=>{try{account=await request('/api/account');if(account.hasStripeCustomer){const x=await request('/api/billing/portal',{method:'POST'});location.href=x.url}else showPaywall()}catch(e){if(e.status===402)showPaywall();else alert(e.message)}};d.querySelector('#freeAccessManage')?.addEventListener('click',complimentaryAccess)}
-  async function afterLogin(){try{account=await request('/api/account');if(!account.hasAccess){showPaywall();return}hide();accountChip();if(typeof window.reload==='function')await window.reload();else if(typeof reload==='function')await reload()}catch(e){if(e.status===402)showPaywall();else{message(e.message);showLogin()}}}
-  async function init(){try{config=await fetch('/api/auth/config').then(r=>r.json());if(!config.supabaseUrl||!config.supabasePublishableKey)throw new Error('Autenticação ainda não configurada.');client=window.supabase.createClient(config.supabaseUrl,config.supabasePublishableKey);client.auth.onAuthStateChange((event,s)=>{session=s;if(event==='PASSWORD_RECOVERY')setTimeout(showNewPassword,0)});const {data}=await client.auth.getSession();session=data.session;if(!session)showLogin();else await afterLogin()}catch(e){mount(`<h1>Kipper Cake Shop</h1><p>${esc(e.message)}</p>`)}}
+  function showBlocked(){
+    const el=mount(`<h1>Conta bloqueada</h1><p>O acesso desta conta à Kipper App foi bloqueado pelo administrador.</p><p class="auth-note">Se considerares que se trata de um engano, contacta o suporte. Uma subscrição paga, quando exista, não é automaticamente cancelada por este bloqueio.</p><button id="authLogout" class="auth-link">Terminar sessão</button>`);
+    el.querySelector('#authLogout').onclick=async()=>{await client.auth.signOut();session=null;account=null;showLogin()}
+  }
+
+  function showPaywall(){
+    const label=config?.priceLabel||'15 €/mês';
+    const el=mount(`<h1>A tua subscrição</h1><p>Para utilizar a Kipper App, ativa o plano Premium. O pagamento é processado de forma segura pelo Stripe.</p><div class="auth-price">${label}</div><div id="authMsg" class="auth-msg"></div><button id="authSubscribe" class="auth-primary">Subscrever Premium</button>${account?.hasStripeCustomer?'<button id="authPortal" class="auth-secondary">Gerir subscrição</button>':''}<button id="authLogout" class="auth-link">Terminar sessão</button>`);
+    el.querySelector('#authSubscribe').onclick=async()=>{try{message('A abrir pagamento…');const x=await request('/api/billing/checkout',{method:'POST',body:JSON.stringify({plan:selectedPlan})});location.href=x.url}catch(e){message(e.message)}};
+    el.querySelector('#authPortal')?.addEventListener('click',async()=>{try{const x=await request('/api/billing/portal',{method:'POST'});location.href=x.url}catch(e){message(e.message)}});
+    el.querySelector('#authLogout').onclick=async()=>{await client.auth.signOut();session=null;account=null;showLogin()}
+  }
+
+  function accountChip(){
+    document.getElementById('authAccount')?.remove();
+    const d=document.createElement('div');d.id='authAccount';d.className='auth-account';
+    d.innerHTML=`${esc(session?.user?.email||'')} · <button id="billingManage">Subscrição</button> · <button id="logoutMini">Sair</button>`;
+    document.body.appendChild(d);
+    d.querySelector('#logoutMini').onclick=async()=>{await client.auth.signOut();session=null;showLogin();d.remove()};
+    d.querySelector('#billingManage').onclick=async()=>{try{account=await request('/api/account');if(account.isAdmin)return alert('A conta de gestão tem acesso administrativo.');if(account.blocked)return showBlocked();if(account.hasStripeCustomer){const x=await request('/api/billing/portal',{method:'POST'});location.href=x.url}else showPaywall()}catch(e){if(e.status===402)showPaywall();else alert(e.message)}}
+  }
+
+  async function afterLogin(){
+    try{
+      account=await request('/api/account');
+      if(account.blocked){showBlocked();return}
+      if(!account.hasAccess){showPaywall();return}
+      hide();accountChip();
+      if(typeof window.reload==='function')await window.reload();else if(typeof reload==='function')await reload()
+    }catch(e){
+      if(e.status===402)showPaywall();
+      else if(e.body?.code==='ACCOUNT_BLOCKED'||e.status===403)showBlocked();
+      else{message(e.message);showLogin()}
+    }
+  }
+
+  async function init(){
+    try{
+      config=await fetch('/api/auth/config').then(r=>r.json());
+      if(!config.supabaseUrl||!config.supabasePublishableKey)throw new Error('Autenticação ainda não configurada.');
+      client=window.supabase.createClient(config.supabaseUrl,config.supabasePublishableKey);
+      client.auth.onAuthStateChange((event,s)=>{session=s;if(event==='PASSWORD_RECOVERY')setTimeout(showNewPassword,0)});
+      const {data}=await client.auth.getSession();session=data.session;if(!session)showLogin();else await afterLogin()
+    }catch(e){mount(`<h1>Kipper App</h1><p>${esc(e.message)}</p>`)}
+  }
+
   window.KIPPER_AUTH={getToken:()=>session?.access_token||'',getSession:()=>session,showPaywall,request,init};
   window.addEventListener('DOMContentLoaded',init);
 })();

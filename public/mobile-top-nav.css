@@ -1,10 +1,17 @@
 /* Kipper branding and mobile top navigation overrides */
 .brand{justify-content:center}
 .brand-logo{display:block;width:100%;max-width:176px;height:auto;object-fit:contain}
+.brand-lockup{display:grid;grid-template-columns:54px 1fr;gap:10px;align-items:center;width:100%}
+.brand-lockup img{display:block;width:54px;height:54px;border-radius:14px;object-fit:cover}
+.brand-name{font-weight:800;letter-spacing:.12em;font-size:14px;line-height:1.15;background:linear-gradient(90deg,#1557ff,#10cfe3);-webkit-background-clip:text;background-clip:text;color:transparent;white-space:nowrap}
+.brand-by{margin-top:5px;font-size:9px;letter-spacing:.2em;color:#777168;white-space:nowrap}
+.brand-by strong{color:#1557ff;font-weight:800}
 
 @media(max-width:1050px) and (min-width:721px){
   .brand{padding-left:0;padding-right:0}
-  .brand-logo{max-width:54px}
+  .brand-lockup{display:block}
+  .brand-lockup img{margin:auto;width:48px;height:48px}
+  .brand-copy{display:none}
 }
 
 @media(max-width:720px){
@@ -18,25 +25,39 @@
     width:100%;
     height:auto;
     z-index:30;
-    padding:7px 9px 8px;
+    padding:8px 9px 8px;
     border-right:0;
     border-top:0;
     border-bottom:1px solid var(--line);
     background:rgba(255,255,255,.98);
     box-shadow:0 7px 20px rgba(37,28,17,.07);
   }
-  .brand{
-    display:flex;
+  #app .sidebar .brand{
+    display:flex!important;
     justify-content:center;
     align-items:center;
-    padding:0 0 6px;
-    margin:0 0 5px;
+    padding:2px 0 8px!important;
+    margin:0 0 6px!important;
     border-bottom:1px solid var(--line);
+    min-height:61px;
   }
-  .brand-logo{max-width:122px;max-height:47px}
+  #app .sidebar .brand-lockup{
+    display:grid!important;
+    grid-template-columns:48px auto;
+    gap:10px;
+    align-items:center;
+    justify-content:center;
+    width:auto;
+    max-width:260px;
+  }
+  #app .sidebar .brand-lockup img{display:block!important;width:48px!important;height:48px!important;border-radius:13px;object-fit:cover}
+  #app .sidebar .brand-copy{display:block!important;text-align:left}
+  #app .sidebar .brand-name{font-size:13px}
+  #app .sidebar .brand-by{font-size:9px}
   .sidebar nav{
     display:flex;
     justify-content:flex-start;
+    align-items:center;
     gap:4px;
     overflow-x:auto;
     overscroll-behavior-inline:contain;
@@ -54,7 +75,7 @@
     white-space:nowrap;
   }
   .nav-btn span{display:block;font-size:10px}
-  .main{padding:132px 14px 42px}
+  .main{padding:145px 14px 42px}
   .topbar{align-items:flex-start}
   .topbar h1{font-size:27px}
   .top-actions .badge{display:none}

@@ -11,32 +11,21 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Kipper App">
   <title>Kipper App</title>
-  <link rel="manifest" href="/manifest.webmanifest?v=3">
-  <link rel="icon" type="image/png" href="/icons/kipper-app-exact-180.png?v=3">
-  <link rel="apple-touch-icon" href="/icons/kipper-app-exact-180.png?v=3">
-  <link rel="stylesheet" href="/style.css">
-  <link rel="stylesheet" href="/mobile-top-nav.css">
-  <link rel="stylesheet" href="/v3.css">
-  <link rel="stylesheet" href="/v4-round.css">
-  <link rel="stylesheet" href="/v5-round.css">
-  <style>
-    .brand{justify-content:center}
-    .brand-lockup{display:grid;grid-template-columns:54px 1fr;gap:10px;align-items:center;width:100%}
-    .brand-lockup img{display:block;width:54px;height:54px;border-radius:14px;object-fit:cover}
-    .brand-name{font-weight:800;letter-spacing:.12em;font-size:14px;line-height:1.15;background:linear-gradient(90deg,#1557ff,#10cfe3);-webkit-background-clip:text;background-clip:text;color:transparent;white-space:nowrap}
-    .brand-by{margin-top:5px;font-size:9px;letter-spacing:.2em;color:#777168;white-space:nowrap}
-    .brand-by strong{color:#1557ff;font-weight:800}
-    @media(max-width:1050px) and (min-width:721px){
-      .brand-lockup{display:block}.brand-lockup img{margin:auto;width:48px;height:48px}.brand-copy{display:none}
-    }
-  </style>
+  <link rel="manifest" href="/manifest.webmanifest?v=4">
+  <link rel="icon" type="image/png" href="/icons/kipper-app-exact-180.png?v=4">
+  <link rel="apple-touch-icon" href="/icons/kipper-app-exact-180.png?v=4">
+  <link rel="stylesheet" href="/style.css?v=4">
+  <link rel="stylesheet" href="/mobile-top-nav.css?v=4">
+  <link rel="stylesheet" href="/v3.css?v=4">
+  <link rel="stylesheet" href="/v4-round.css?v=4">
+  <link rel="stylesheet" href="/v5-round.css?v=4">
 </head>
 <body>
 <div id="app">
   <aside class="sidebar">
     <div class="brand">
       <div class="brand-lockup" aria-label="Kipper App by Starta">
-        <img src="/icons/kipper-app-exact-180.png?v=3" alt="Kipper App">
+        <img src="/icons/kipper-app-exact-180.png?v=4" alt="Kipper App">
         <div class="brand-copy"><div class="brand-name">KIPPER APP</div><div class="brand-by">by <strong>STARTA</strong></div></div>
       </div>
     </div>
@@ -58,7 +47,7 @@
 <div id="modal" class="modal hidden"><div class="modal-card"><button class="modal-close" data-close>×</button><div id="modalBody"></div></div></div>
 <div id="toast" class="toast hidden"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/auth-ui.js"></script>
+<script src="/auth-ui.js?v=4"></script>
 <script src="/demo-data.js"></script>
 <script src="/state.js"></script>
 <script src="/auth-api-patch.js"></script>
@@ -73,11 +62,11 @@
 <script src="/v3-orders.js"></script>
 <script src="/v4-round.js"></script>
 <script src="/v5-round.js"></script>
-<script src="/admin-management.js"></script>
+<script src="/admin-management.js?v=4"></script>
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js?v=3').catch(error => console.warn('PWA service worker:', error));
+      navigator.serviceWorker.register('/sw.js?v=4').catch(error => console.warn('PWA service worker:', error));
     });
   }
 </script>

@@ -1,17 +1,17 @@
 {
-  "id": "/?pwa=kipper-v3",
+  "id": "/",
   "name": "Kipper App",
-  "short_name": "Kipper App",
+  "short_name": "Kipper",
   "description": "Kipper App — aplicação de gestão desenvolvida pela Starta com o apoio da Kipper.",
   "lang": "pt-PT",
-  "start_url": "/?pwa=kipper-v3",
+  "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#ffffff",
   "categories": ["business", "productivity"],
   "icons": [
-    {"src": "/icons/kipper-app-exact-180.png?v=3", "sizes": "180x180", "type": "image/png", "purpose": "any"},
-    {"src": "/icons/kipper-app-exact.svg?v=3", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable"}
+    {"src": "/icons/kipper-app-exact-180.png?v=4", "sizes": "180x180", "type": "image/png", "purpose": "any"},
+    {"src": "/icons/kipper-app-exact.svg?v=4", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable"}
   ]
 }
