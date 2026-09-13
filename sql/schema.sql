@@ -9,6 +9,68 @@ CREATE TABLE IF NOT EXISTS app_users (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+ALTER TABLE app_users ADD COLUMN IF NOT EXISTS blocked BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE app_users ADD COLUMN IF NOT EXISTS plan_name TEXT NOT NULL DEFAULT 'Premium';
+ALTER TABLE app_users ADD COLUMN IF NOT EXISTS referral_code TEXT;
+ALTER TABLE app_users ADD COLUMN IF NOT EXISTS referred_by_user_id UUID;
+ALTER TABLE app_users ADD COLUMN IF NOT EXISTS ever_had_access BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE app_users ADD COLUMN IF NOT EXISTS access_first_at TIMESTAMPTZ;
+ALTER TABLE app_users ADD COLUMN IF NOT EXISTS access_last_started_at TIMESTAMPTZ;
+ALTER TABLE app_users ADD COLUMN IF NOT EXISTS access_ended_at TIMESTAMPTZ;
+ALTER TABLE app_users ADD COLUMN IF NOT EXISTS last_access_type TEXT;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint
+    WHERE conname='app_users_referred_by_fkey'
+  ) THEN
+    ALTER TABLE app_users
+      ADD CONSTRAINT app_users_referred_by_fkey
+      FOREIGN KEY (referred_by_user_id) REFERENCES app_users(user_id) ON DELETE SET NULL;
+  END IF;
+END $$;
+
+CREATE UNIQUE INDEX IF NOT EXISTS app_users_referral_code_key
+  ON app_users(referral_code) WHERE referral_code IS NOT NULL;
+CREATE INDEX IF NOT EXISTS app_users_referred_by_idx ON app_users(referred_by_user_id);
+
+UPDATE app_users
+SET plan_name='Premium'
+WHERE plan_name IS NULL OR btrim(plan_name)='';
+
+UPDATE app_users
+SET ever_had_access=TRUE,
+    access_first_at=COALESCE(access_first_at,created_at),
+    access_last_started_at=COALESCE(access_last_started_at,created_at),
+    last_access_type=CASE
+      WHEN free_access AND subscription_status IN ('active','trialing') THEN 'Subscrição paga + grátis'
+      WHEN free_access THEN 'Acesso grátis'
+      WHEN subscription_status IN ('active','trialing') OR stripe_subscription_id IS NOT NULL THEN 'Subscrição paga'
+      ELSE last_access_type
+    END,
+    access_ended_at=CASE
+      WHEN blocked OR (NOT free_access AND subscription_status NOT IN ('active','trialing'))
+        THEN COALESCE(access_ended_at,updated_at)
+      ELSE NULL
+    END
+WHERE free_access
+   OR subscription_status IN ('active','trialing')
+   OR stripe_subscription_id IS NOT NULL;
+
+CREATE TABLE IF NOT EXISTS app_payments (
+  invoice_id TEXT PRIMARY KEY,
+  stripe_customer_id TEXT,
+  user_id UUID REFERENCES app_users(user_id) ON DELETE SET NULL,
+  amount NUMERIC(12,2) NOT NULL DEFAULT 0,
+  currency TEXT NOT NULL DEFAULT 'EUR',
+  plan_name TEXT NOT NULL DEFAULT 'Premium',
+  paid_at TIMESTAMPTZ NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS app_payments_paid_at_idx ON app_payments(paid_at DESC);
+CREATE INDEX IF NOT EXISTS app_payments_user_idx ON app_payments(user_id);
+
 CREATE TABLE IF NOT EXISTS app_meta (
   key TEXT PRIMARY KEY,
   value TEXT NOT NULL
