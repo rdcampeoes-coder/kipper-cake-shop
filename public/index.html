@@ -11,32 +11,20 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Kipper App">
   <title>Kipper App</title>
-  <link rel="manifest" href="/manifest.webmanifest?v=6">
-  <link rel="icon" type="image/png" href="/icons/kipper-app-exact-180.png?v=6">
-  <link rel="apple-touch-icon" href="/icons/kipper-app-exact-180.png?v=6">
-  <link rel="stylesheet" href="/style.css?v=6">
-  <link rel="stylesheet" href="/mobile-top-nav.css?v=6">
-  <link rel="stylesheet" href="/v3.css?v=6">
-  <link rel="stylesheet" href="/v4-round.css?v=6">
-  <link rel="stylesheet" href="/v5-round.css?v=6">
+  <link rel="manifest" href="/manifest.webmanifest?v=8">
+  <link rel="icon" type="image/png" href="/icons/kipper-app-exact-180.png?v=8">
+  <link rel="apple-touch-icon" href="/icons/kipper-app-exact-180.png?v=8">
+  <link rel="stylesheet" href="/style.css?v=8">
+  <link rel="stylesheet" href="/mobile-top-nav.css?v=8">
+  <link rel="stylesheet" href="/v3.css?v=8">
+  <link rel="stylesheet" href="/v4-round.css?v=8">
+  <link rel="stylesheet" href="/v5-round.css?v=8">
 </head>
 <body>
 <div id="app">
   <aside class="sidebar">
     <div class="brand">
-      <svg class="brand-header-image" viewBox="100 240 1340 430" role="img" aria-label="Kipper App by Starta" preserveAspectRatio="xMidYMid meet">
-        <title>Kipper App by Starta</title>
-        <defs>
-          <filter id="kipper-remove-black" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
-            <feColorMatrix in="SourceGraphic" type="luminanceToAlpha" result="kipper-luma"/>
-            <feComponentTransfer in="kipper-luma" result="kipper-mask">
-              <feFuncA type="linear" slope="12" intercept="-0.6"/>
-            </feComponentTransfer>
-            <feComposite in="SourceGraphic" in2="kipper-mask" operator="in"/>
-          </filter>
-        </defs>
-        <image href="/icons/kipper-app-header.jpg?v=7" x="0" y="0" width="1536" height="864" preserveAspectRatio="none" filter="url(#kipper-remove-black)"/>
-      </svg>
+      <img class="brand-header-image" src="/icons/kipper-header-transparent-600.webp?v=8" alt="Kipper App by Starta">
     </div>
     <nav>
       <button class="nav-btn active" data-view="dashboard">⌂ <span>Início</span></button>
@@ -56,7 +44,7 @@
 <div id="modal" class="modal hidden"><div class="modal-card"><button class="modal-close" data-close>×</button><div id="modalBody"></div></div></div>
 <div id="toast" class="toast hidden"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/auth-ui.js?v=6"></script>
+<script src="/auth-ui.js?v=8"></script>
 <script src="/demo-data.js"></script>
 <script src="/state.js"></script>
 <script src="/auth-api-patch.js"></script>
@@ -71,11 +59,11 @@
 <script src="/v3-orders.js"></script>
 <script src="/v4-round.js"></script>
 <script src="/v5-round.js"></script>
-<script src="/admin-management.js?v=6"></script>
+<script src="/admin-management.js?v=8"></script>
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js?v=7').catch(error => console.warn('PWA service worker:', error));
+      navigator.serviceWorker.register('/sw.js?v=8').catch(error => console.warn('PWA service worker:', error));
     });
   }
 </script>

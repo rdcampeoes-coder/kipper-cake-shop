@@ -1,10 +1,10 @@
 /* Kipper branding and mobile top navigation overrides */
 .brand{justify-content:center}
-.brand-header-image{display:block;width:100%;max-width:205px;height:auto;object-fit:contain;border-radius:14px}
+.brand-header-image{display:block;width:100%;max-width:235px;height:auto;object-fit:contain;background:transparent}
 
 @media(max-width:1050px) and (min-width:721px){
   .brand{padding-left:0;padding-right:0}
-  .brand-header-image{max-width:165px}
+  .brand-header-image{max-width:175px}
 }
 
 @media(max-width:720px){
@@ -32,16 +32,16 @@
     padding:0 0 7px!important;
     margin:0 0 6px!important;
     border-bottom:1px solid var(--line);
-    min-height:92px;
+    min-height:98px;
   }
   #app .sidebar .brand-header-image{
     display:block!important;
-    width:min(94vw,420px)!important;
-    max-width:420px!important;
-    height:82px!important;
+    width:min(92vw,360px)!important;
+    max-width:360px!important;
+    height:auto!important;
+    max-height:86px!important;
     object-fit:contain!important;
     object-position:center!important;
-    border-radius:12px!important;
   }
   .sidebar nav{
     display:flex;
@@ -64,7 +64,7 @@
     white-space:nowrap;
   }
   .nav-btn span{display:block;font-size:10px}
-  .main{padding:176px 14px 42px}
+  .main{padding:180px 14px 42px}
   .topbar{align-items:flex-start}
   .topbar h1{font-size:27px}
   .top-actions .badge{display:none}
