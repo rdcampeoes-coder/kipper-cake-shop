@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kipper-app-v6';
+const CACHE_NAME = 'kipper-app-v7';
 const APP_SHELL = [
   '/',
   '/index.html',
@@ -10,7 +10,7 @@ const APP_SHELL = [
   '/v5-round.css?v=6',
   '/auth-ui.js?v=6',
   '/admin-management.js?v=6',
-  '/icons/kipper-app-header.jpg?v=6',
+  '/icons/kipper-app-header.jpg?v=7',
   '/icons/kipper-app-exact-180.png?v=6',
   '/icons/kipper-app-exact.svg?v=6'
 ];
