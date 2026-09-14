@@ -11,20 +11,20 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Kipper App">
   <title>Kipper App</title>
-  <link rel="manifest" href="/manifest.webmanifest?v=12">
-  <link rel="icon" type="image/png" href="/icons/kipper-app-exact-180.png?v=12">
-  <link rel="apple-touch-icon" href="/icons/kipper-app-exact-180.png?v=12">
-  <link rel="stylesheet" href="/style.css?v=12">
-  <link rel="stylesheet" href="/mobile-top-nav.css?v=12">
-  <link rel="stylesheet" href="/v3.css?v=12">
-  <link rel="stylesheet" href="/v4-round.css?v=12">
-  <link rel="stylesheet" href="/v5-round.css?v=12">
+  <link rel="manifest" href="/manifest.webmanifest?v=13">
+  <link rel="icon" type="image/png" href="/icons/kipper-app-exact-180.png?v=13">
+  <link rel="apple-touch-icon" href="/icons/kipper-app-exact-180.png?v=13">
+  <link rel="stylesheet" href="/style.css?v=13">
+  <link rel="stylesheet" href="/mobile-top-nav.css?v=13">
+  <link rel="stylesheet" href="/v3.css?v=13">
+  <link rel="stylesheet" href="/v4-round.css?v=13">
+  <link rel="stylesheet" href="/v5-round.css?v=13">
 </head>
 <body>
 <div id="app">
   <aside class="sidebar">
     <div class="brand brand-v12">
-      <img class="brand-logo-v12" src="/icons/kipper-header-transparent-480.png?v=12" alt="Kipper App by Starta">
+      <img class="brand-logo-v12" src="/icons/kipper-header-clean.svg?v=13" alt="Kipper App by Starta">
     </div>
     <nav>
       <button class="nav-btn active" data-view="dashboard">⌂ <span>Início</span></button>
@@ -44,7 +44,7 @@
 <div id="modal" class="modal hidden"><div class="modal-card"><button class="modal-close" data-close>×</button><div id="modalBody"></div></div></div>
 <div id="toast" class="toast hidden"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/auth-ui.js?v=12"></script>
+<script src="/auth-ui.js?v=13"></script>
 <script src="/demo-data.js"></script>
 <script src="/state.js"></script>
 <script src="/auth-api-patch.js"></script>
@@ -59,11 +59,11 @@
 <script src="/v3-orders.js"></script>
 <script src="/v4-round.js"></script>
 <script src="/v5-round.js"></script>
-<script src="/admin-management.js?v=12"></script>
+<script src="/admin-management.js?v=13"></script>
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js?v=12').then(registration => registration.update()).catch(error => console.warn('PWA service worker:', error));
+      navigator.serviceWorker.register('/sw.js?v=13').then(registration => registration.update()).catch(error => console.warn('PWA service worker:', error));
     });
   }
 </script>
