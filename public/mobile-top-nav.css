@@ -26,22 +26,20 @@
     box-shadow:0 7px 20px rgba(37,28,17,.07);
   }
   #app .sidebar .brand{
-    display:flex!important;
-    justify-content:center;
-    align-items:center;
-    padding:0 0 7px!important;
+    display:block!important;
+    width:100%!important;
+    height:118px!important;
+    min-height:118px!important;
+    padding:0!important;
     margin:0 0 6px!important;
     border-bottom:1px solid var(--line);
-    min-height:98px;
+    background-image:url('/icons/kipper-header-transparent-480.png?v=11')!important;
+    background-repeat:no-repeat!important;
+    background-position:center center!important;
+    background-size:min(88vw,340px) auto!important;
   }
   #app .sidebar .brand-header-image{
-    display:block!important;
-    width:min(92vw,360px)!important;
-    max-width:360px!important;
-    height:auto!important;
-    max-height:86px!important;
-    object-fit:contain!important;
-    object-position:center!important;
+    display:none!important;
   }
   .sidebar nav{
     display:flex;
@@ -64,7 +62,7 @@
     white-space:nowrap;
   }
   .nav-btn span{display:block;font-size:10px}
-  .main{padding:180px 14px 42px}
+  .main{padding:200px 14px 42px}
   .topbar{align-items:flex-start}
   .topbar h1{font-size:27px}
   .top-actions .badge{display:none}
