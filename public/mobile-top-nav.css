@@ -28,22 +28,23 @@
   #app .sidebar .brand.brand-v12{
     display:flex!important;
     width:100%!important;
-    height:auto!important;
-    min-height:122px!important;
+    height:118px!important;
+    min-height:118px!important;
+    max-height:118px!important;
     justify-content:center!important;
     align-items:center!important;
-    padding:5px 0 8px!important;
+    padding:8px 0 10px!important;
     margin:0 0 6px!important;
     border-bottom:1px solid var(--line);
     background:none!important;
-    overflow:visible!important;
+    overflow:hidden!important;
   }
   #app .sidebar .brand-v12 .brand-logo-v12{
     display:block!important;
-    width:min(88vw,340px)!important;
-    max-width:340px!important;
-    height:auto!important;
-    max-height:none!important;
+    width:auto!important;
+    max-width:min(84vw,320px)!important;
+    height:88px!important;
+    max-height:88px!important;
     aspect-ratio:auto!important;
     object-fit:contain!important;
     object-position:center!important;
@@ -71,7 +72,7 @@
     white-space:nowrap;
   }
   .nav-btn span{display:block;font-size:10px}
-  .main{padding:205px 14px 42px}
+  .main{padding:188px 14px 42px}
   .topbar{align-items:flex-start}
   .topbar h1{font-size:27px}
   .top-actions .badge{display:none}
