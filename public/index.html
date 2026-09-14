@@ -24,7 +24,19 @@
 <div id="app">
   <aside class="sidebar">
     <div class="brand">
-      <img class="brand-header-image" src="/icons/kipper-app-header.jpg?v=6" alt="Kipper App by Starta">
+      <svg class="brand-header-image" viewBox="100 240 1340 430" role="img" aria-label="Kipper App by Starta" preserveAspectRatio="xMidYMid meet">
+        <title>Kipper App by Starta</title>
+        <defs>
+          <filter id="kipper-remove-black" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
+            <feColorMatrix in="SourceGraphic" type="luminanceToAlpha" result="kipper-luma"/>
+            <feComponentTransfer in="kipper-luma" result="kipper-mask">
+              <feFuncA type="linear" slope="12" intercept="-0.6"/>
+            </feComponentTransfer>
+            <feComposite in="SourceGraphic" in2="kipper-mask" operator="in"/>
+          </filter>
+        </defs>
+        <image href="/icons/kipper-app-header.jpg?v=7" x="0" y="0" width="1536" height="864" preserveAspectRatio="none" filter="url(#kipper-remove-black)"/>
+      </svg>
     </div>
     <nav>
       <button class="nav-btn active" data-view="dashboard">⌂ <span>Início</span></button>
@@ -63,7 +75,7 @@
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js?v=6').catch(error => console.warn('PWA service worker:', error));
+      navigator.serviceWorker.register('/sw.js?v=7').catch(error => console.warn('PWA service worker:', error));
     });
   }
 </script>
