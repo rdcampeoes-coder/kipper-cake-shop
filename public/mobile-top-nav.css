@@ -1,10 +1,10 @@
 /* Kipper branding and mobile top navigation overrides */
 .brand{justify-content:center}
-.brand-header-image{display:block;width:100%;max-width:235px;height:auto;object-fit:contain;background:transparent}
+.brand-logo-v12{display:block;width:100%;max-width:235px;height:auto;max-height:none;object-fit:contain;background:transparent}
 
 @media(max-width:1050px) and (min-width:721px){
   .brand{padding-left:0;padding-right:0}
-  .brand-header-image{max-width:175px}
+  .brand-logo-v12{max-width:175px}
 }
 
 @media(max-width:720px){
@@ -25,21 +25,30 @@
     background:rgba(255,255,255,.98);
     box-shadow:0 7px 20px rgba(37,28,17,.07);
   }
-  #app .sidebar .brand{
-    display:block!important;
+  #app .sidebar .brand.brand-v12{
+    display:flex!important;
     width:100%!important;
-    height:118px!important;
-    min-height:118px!important;
-    padding:0!important;
+    height:auto!important;
+    min-height:122px!important;
+    justify-content:center!important;
+    align-items:center!important;
+    padding:5px 0 8px!important;
     margin:0 0 6px!important;
     border-bottom:1px solid var(--line);
-    background-image:url('/icons/kipper-header-transparent-480.png?v=11')!important;
-    background-repeat:no-repeat!important;
-    background-position:center center!important;
-    background-size:min(88vw,340px) auto!important;
+    background:none!important;
+    overflow:visible!important;
   }
-  #app .sidebar .brand-header-image{
-    display:none!important;
+  #app .sidebar .brand-v12 .brand-logo-v12{
+    display:block!important;
+    width:min(88vw,340px)!important;
+    max-width:340px!important;
+    height:auto!important;
+    max-height:none!important;
+    aspect-ratio:auto!important;
+    object-fit:contain!important;
+    object-position:center!important;
+    flex:0 0 auto!important;
+    transform:none!important;
   }
   .sidebar nav{
     display:flex;
@@ -62,7 +71,7 @@
     white-space:nowrap;
   }
   .nav-btn span{display:block;font-size:10px}
-  .main{padding:200px 14px 42px}
+  .main{padding:205px 14px 42px}
   .topbar{align-items:flex-start}
   .topbar h1{font-size:27px}
   .top-actions .badge{display:none}
