@@ -58,27 +58,30 @@ export async function ensureDemoRecipesForUser(pool,userId,{force=false}={}){
         'INSERT INTO ingredients(user_id,name,unit,stock,min_stock,active) VALUES($1,$2,$3,$4,$5,TRUE) RETURNING id,name',
         [userId,name,unit,stock,minStock]
       );
+      await c.query('UPDATE ingredients SET active=TRUE WHERE id=$1 AND user_id=$2',[row.id,userId]);
       ingredientIds.set(name,Number(row.id));
     }
 
     for(const [name,category,price,pricingType] of DEMO_PRODUCTS){
-      await firstOrInsert(
+      const productRow=await firstOrInsert(
         c,
         'SELECT id FROM products WHERE user_id=$1 AND name=$2 ORDER BY id LIMIT 1',
         [userId,name],
         'INSERT INTO products(user_id,name,category,price,pricing_type,active) VALUES($1,$2,$3,$4,$5,TRUE) RETURNING id',
         [userId,name,category,price,pricingType]
       );
+      await c.query('UPDATE products SET active=TRUE WHERE id=$1 AND user_id=$2',[productRow.id,userId]);
     }
 
     for(const [name,cakeWeight,coverWeight] of DEMO_SIZES){
-      await firstOrInsert(
+      const sizeRow=await firstOrInsert(
         c,
         'SELECT id FROM sizes WHERE user_id=$1 AND name=$2 ORDER BY id LIMIT 1',
         [userId,name],
         'INSERT INTO sizes(user_id,name,cake_weight,cover_weight,active) VALUES($1,$2,$3,$4,TRUE) RETURNING id',
         [userId,name,cakeWeight,coverWeight]
       );
+      await c.query('UPDATE sizes SET active=TRUE WHERE id=$1 AND user_id=$2',[sizeRow.id,userId]);
     }
 
     let seeded=0;
@@ -97,6 +100,7 @@ export async function ensureDemoRecipesForUser(pool,userId,{force=false}={}){
         created=true;
       }
 
+      await c.query('UPDATE components SET active=TRUE WHERE id=$1 AND user_id=$2',[component.id,userId]);
       const recipeCount=await c.query('SELECT COUNT(*)::int AS n FROM component_ingredients WHERE component_id=$1',[component.id]);
       const hasRecipe=Number(recipeCount.rows[0]?.n||0)>0;
 
