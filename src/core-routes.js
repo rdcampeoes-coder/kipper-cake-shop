@@ -1,9 +1,11 @@
+import { ensureDemoRecipesForUser } from './demo-recipes.js';
 const empty={clients:[],ingredients:[],products:[],sizes:[],components:[],orders:[],expenses:[],movements:[],demoRecipes:false};
 export function registerCoreRoutes(app,pool,hasDatabase){
   app.get('/api/health',(req,res)=>res.json({ok:true,database:hasDatabase}));
   app.get('/api/bootstrap',async(req,res,next)=>{try{
     if(!pool)return res.json(empty);
     const u=req.user.id;
+    await ensureDemoRecipesForUser(pool,u,{force:false});
     const [clients,ingredients,products,sizes,components,orders,items,expenses,movements,recipes]=await Promise.all([
       pool.query('SELECT * FROM clients WHERE user_id=$1 ORDER BY name',[u]),
       pool.query('SELECT * FROM ingredients WHERE user_id=$1 AND active=TRUE ORDER BY name',[u]),
@@ -18,7 +20,7 @@ export function registerCoreRoutes(app,pool,hasDatabase){
     ]);
     const comps=components.rows.map(c=>({...c,recipe:recipes.rows.filter(r=>Number(r.component_id)===Number(c.id))}));
     const ords=orders.rows.map(o=>({...o,items:items.rows.filter(i=>Number(i.order_id)===Number(o.id))}));
-    res.json({clients:clients.rows,ingredients:ingredients.rows,products:products.rows,sizes:sizes.rows,components:comps,orders:ords,expenses:expenses.rows,movements:movements.rows,demoRecipes:false});
+    res.json({clients:clients.rows,ingredients:ingredients.rows,products:products.rows,sizes:sizes.rows,components:comps,orders:ords,expenses:expenses.rows,movements:movements.rows,demoRecipes:comps.some(c=>c.is_demo&&c.recipe?.length)});
   }catch(e){next(e)}});
 
   const needDb=res=>{if(!pool){res.status(503).json({error:'Base de dados não configurada'});return true}return false};
@@ -42,5 +44,5 @@ export function registerCoreRoutes(app,pool,hasDatabase){
   app.put('/api/expenses/:id',async(req,res,next)=>{try{if(needDb(res))return;const b=req.body,{rows}=await pool.query('UPDATE expenses SET name=$1,expense_type=$2,value=$3,expense_date=$4 WHERE id=$5 AND user_id=$6 RETURNING *',[b.name,b.expense_type,b.value,b.expense_date,+req.params.id,req.user.id]);res.json(rows[0])}catch(e){next(e)}});
 
   app.delete('/api/:type/:id',async(req,res,next)=>{try{if(needDb(res))return;const u=req.user.id,id=+req.params.id,type=req.params.type,cfg={products:['products',1],components:['components',1],sizes:['sizes',1],expenses:['expenses',0],clients:['clients',0]}[type];if(!cfg)return res.status(404).json({error:'Tipo inválido'});if(type==='clients'){const used=await pool.query('SELECT 1 FROM orders WHERE client_id=$1 AND user_id=$2 LIMIT 1',[id,u]);if(used.rows[0])return res.status(409).json({error:'Este cliente tem histórico de encomendas e não pode ser apagado.'})}if(cfg[1])await pool.query(`UPDATE ${cfg[0]} SET active=FALSE WHERE id=$1 AND user_id=$2`,[id,u]);else await pool.query(`DELETE FROM ${cfg[0]} WHERE id=$1 AND user_id=$2`,[id,u]);res.json({ok:true})}catch(e){next(e)}});
-  app.post('/api/admin/reset-recipes',async(req,res,next)=>{try{if(needDb(res))return;const u=req.user.id,c=await pool.connect();try{await c.query('BEGIN');await c.query('DELETE FROM component_ingredients WHERE component_id IN (SELECT id FROM components WHERE user_id=$1)',[u]);await c.query('UPDATE components SET reference_weight=0,is_demo=FALSE WHERE user_id=$1',[u]);await c.query('COMMIT');res.json({ok:true})}catch(e){await c.query('ROLLBACK');throw e}finally{c.release()}}catch(e){next(e)}});
+  app.post('/api/admin/reset-recipes',async(req,res,next)=>{try{if(needDb(res))return;const result=await ensureDemoRecipesForUser(pool,req.user.id,{force:true});res.json({ok:true,...result})}catch(e){next(e)}});
 }
