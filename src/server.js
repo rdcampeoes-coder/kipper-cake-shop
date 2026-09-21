@@ -6,6 +6,7 @@ import { pool, hasDatabase, initDatabase } from './db.js';
 import { registerCoreRoutes } from './core-routes.js';
 import { registerOrderRoutes } from './order-routes.js';
 import { registerBillingRoutes,registerStripeWebhook,authMiddleware,requirePaidAccess } from './auth-billing.js';
+import { seedDemoRecipesForAllUsers } from './demo-recipes.js';
 
 const app=express();
 const stripe=process.env.STRIPE_SECRET_KEY?new Stripe(process.env.STRIPE_SECRET_KEY):null;
@@ -29,4 +30,4 @@ app.use((err,req,res,next)=>{
   });
 });
 const port=process.env.PORT||3000;
-initDatabase().then(()=>app.listen(port,()=>console.log(`Kipper app em http://localhost:${port}`))).catch(err=>{console.error('DB init falhou',err);process.exit(1)});
+initDatabase().then(async()=>{await seedDemoRecipesForAllUsers(pool);app.listen(port,()=>console.log(`Kipper app em http://localhost:${port}`))}).catch(err=>{console.error('DB init falhou',err);process.exit(1)});
