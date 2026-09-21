@@ -18,6 +18,8 @@ const DEMO_PRODUCTS = [
 const DEMO_SIZES = [['P',650,400],['M',1100,600]];
 
 const DEMO_COMPONENTS = [
+  {name:'Bolo de Cenoura',group:'Massa',weight:1217,recipe:[['Cenoura',250],['Ovos',200],['Óleo vegetal',180],['Açúcar',330],['Farinha de trigo',240],['Fermento em pó',14],['Sal',3]]},
+  {name:'Cobertura de Chocolate',group:'Cobertura',weight:695,recipe:[['Leite condensado',395],['Creme de leite UHT',100],['Chocolate meio amargo',200]]},
   {name:'Bolo de Chocolate',group:'Massa',weight:1196,recipe:[['Farinha de trigo',300],['Açúcar',280],['Ovos',200],['Chocolate em pó',70],['Manteiga',120],['Natas',180],['Fermento em pó',12],['Sal',4],['Essência de baunilha',30]]},
   {name:'Bolo de Baunilha',group:'Massa',weight:1156,recipe:[['Farinha de trigo',320],['Açúcar',260],['Ovos',200],['Manteiga',150],['Natas',180],['Fermento em pó',12],['Essência de baunilha',30],['Sal',4]]},
   {name:'Bento Cake',group:'Produto',weight:550,recipe:[['Farinha de trigo',150],['Açúcar',130],['Ovos',100],['Manteiga',70],['Leite',80],['Fermento em pó',8],['Essência de baunilha',8],['Sal',4]]},
@@ -99,7 +101,6 @@ export async function ensureDemoRecipesForUser(pool,userId,{force=false}={}){
       const hasRecipe=Number(recipeCount.rows[0]?.n||0)>0;
 
       if(!force && !created && hasRecipe) continue;
-      if(!force && !created && component.is_demo===false) continue;
 
       await c.query(
         'UPDATE components SET component_group=$1,reference_weight=$2,is_demo=TRUE,active=TRUE WHERE id=$3 AND user_id=$4',
